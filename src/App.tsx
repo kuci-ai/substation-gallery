@@ -115,7 +115,7 @@ function App() {
       }
       
       if (isImage && parsedInfo.category === 'Test Sheet') {
-        invalidFiles.push(`${file.name} - Test Sheet category (ts_cbm, ts_vitest) must be PDF files`);
+        invalidFiles.push(`${file.name} - ERROR: ts_cbm and ts_vitest files MUST be PDF format, not images`);
         return;
       }
 
@@ -123,7 +123,7 @@ function App() {
     });
 
     if (invalidFiles.length > 0) {
-      alert(`The following files were rejected:\n\n${invalidFiles.join('\n')}\n\nValid format examples:\n- vi_switchgear_image.jpg\n- sc_transformer_location_date.jpg\n- ts_cbm_test.pdf\n\nNote: Only ts_cbm and ts_vitest can be PDF files. All other categories must be image files.`);
+      alert(`The following files were rejected:\n\n${invalidFiles.join('\n')}\n\nValid format examples:\n- vi_switchgear_image.jpg\n- sc_transformer_location_date.jpg\n- ts_cbm_test.pdf\n\nIMPORTANT RULES:\n• ts_cbm and ts_vitest files MUST be PDF format only\n• All other categories (gen_, sc_, vi_, stk_, mi_) must be image files (jpg, png, tif)`);
     }
 
     setSelectedFiles(prev => [...prev, ...validFiles]);
@@ -322,7 +322,8 @@ function App() {
           <h2 className="text-xl font-semibold text-slate-800 mb-4">Upload Images</h2>
           <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center">
                 <p className="text-slate-600 mb-2">Click to select files</p>
-                <p className="text-sm text-slate-500 mb-4">Images (jpg, png, tif) or Test Sheets (PDF only for ts_cbm, ts_vitest)</p>
+                <p className="text-sm text-slate-500 mb-2">Images (jpg, png, tif) for most categories</p>
+                <p className="text-sm text-red-600 mb-4 font-medium">⚠️ ts_cbm and ts_vitest MUST be PDF files only</p>
                 <p className="text-xs text-slate-400 mb-2">Filename format: prefix_shortform_[location]_[date]_[sequence].ext</p>
                 <p className="text-xs text-slate-400 mb-4">Examples: vi_switchgear_image.jpg, sc_transformer_location_date.jpg, ts_cbm_test.pdf</p>
             
