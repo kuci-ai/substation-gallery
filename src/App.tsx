@@ -90,28 +90,42 @@ function App() {
     const files = Array.from(e.target.files || []);
     const validFiles: File[] = [];
     const invalidFiles: string[] = [];
-    
+
     files.forEach(file => {
       const isImage = file.type.startsWith('image/');
       const isPdf = file.type === 'application/pdf';
-      
+
       if (!isImage && !isPdf) {
         invalidFiles.push(`${file.name} - Invalid file type`);
         return;
       }
-      
+
       if (!isValidNamingFormat(file.name)) {
         invalidFiles.push(`${file.name} - Invalid naming format (must follow prefix_shortform)`);
         return;
       }
+
+      // Parse filename to check category
+      const parsedInfo = parseImageFilename(file.name);
       
+      // Only ts_cbm and ts_vitest can be PDF, others must be images
+      if (isPdf && parsedInfo.category !== 'Test Sheet') {
+        invalidFiles.push(`${file.name} - PDF files only allowed for Test Sheet category (ts_cbm, ts_vitest)`);
+        return;
+      }
+      
+      if (isImage && parsedInfo.category === 'Test Sheet') {
+        invalidFiles.push(`${file.name} - Test Sheet category (ts_cbm, ts_vitest) must be PDF files`);
+        return;
+      }
+
       validFiles.push(file);
     });
-    
+
     if (invalidFiles.length > 0) {
-      alert(`The following files were rejected:\n\n${invalidFiles.join('\n')}\n\nValid format examples:\n- vi_switchgear_image.jpg\n- sc_transformer_location_date.jpg\n- ts_cbm_test.pdf`);
+      alert(`The following files were rejected:\n\n${invalidFiles.join('\n')}\n\nValid format examples:\n- vi_switchgear_image.jpg\n- sc_transformer_location_date.jpg\n- ts_cbm_test.pdf\n\nNote: Only ts_cbm and ts_vitest can be PDF files. All other categories must be image files.`);
     }
-    
+
     setSelectedFiles(prev => [...prev, ...validFiles]);
   };
 
@@ -307,10 +321,10 @@ function App() {
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <h2 className="text-xl font-semibold text-slate-800 mb-4">Upload Images</h2>
           <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center">
-            <p className="text-slate-600 mb-2">Click to select files</p>
-            <p className="text-sm text-slate-500 mb-4">Images (jpg, png, tif) or Test Sheets (pdf only)</p>
-            <p className="text-xs text-slate-400 mb-2">Filename format: prefix_shortform_[location]_[date]_[sequence].ext</p>
-            <p className="text-xs text-slate-400 mb-4">Examples: vi_switchgear_image.jpg, sc_transformer_location_date.jpg</p>
+                <p className="text-slate-600 mb-2">Click to select files</p>
+                <p className="text-sm text-slate-500 mb-4">Images (jpg, png, tif) or Test Sheets (PDF only for ts_cbm, ts_vitest)</p>
+                <p className="text-xs text-slate-400 mb-2">Filename format: prefix_shortform_[location]_[date]_[sequence].ext</p>
+                <p className="text-xs text-slate-400 mb-4">Examples: vi_switchgear_image.jpg, sc_transformer_location_date.jpg, ts_cbm_test.pdf</p>
             
             <input
               type="file"
