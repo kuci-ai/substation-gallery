@@ -377,7 +377,12 @@ function App() {
                   acc[category].push(image);
                   return acc;
                 }, {} as Record<string, any[]>)
-              ).map(([category, images]) => (
+              ).sort(([a], [b]) => {
+                // Sort categories with Test Sheet last
+                if (a === 'Test Sheet') return 1;
+                if (b === 'Test Sheet') return -1;
+                return a.localeCompare(b);
+              }).map(([category, images]) => (
                 <div key={category} className="space-y-4">
                   <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                     <div className="flex items-center space-x-3">
@@ -396,13 +401,18 @@ function App() {
                     </div>
                     <button
                       onClick={() => {
-                        if (!confirm(`Delete all ${images.length} images in ${category}?`)) return;
+                        const confirmMessage = `Are you sure you want to delete all ${images.length} image${images.length !== 1 ? 's' : ''} in the "${category}" category?\n\nThis action cannot be undone.`;
+                        if (!confirm(confirmMessage)) return;
+                        
                         const updatedImages = uploadedImages.filter(img => img.category !== category);
                         setUploadedImages(updatedImages);
                         localStorage.setItem('uploaded_images', JSON.stringify(updatedImages));
                       }}
-                      className="text-red-500 hover:text-red-700 text-sm font-medium transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 hover:text-red-800 border border-red-200 hover:border-red-300 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                     >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
                       Delete All
                     </button>
                   </div>
